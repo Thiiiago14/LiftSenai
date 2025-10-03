@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - LiftSenai</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg,#071025 0%,#081426 60%);
+      color: #e6eef6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      padding: 30px;
+      border-radius: 12px;
+      width: 360px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+    button {
+      background: #06b6d4;
+      color: #022;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .msg {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #fca5a5;
+      min-height: 18px;
+    }
+    a {
+      display: block;
+      margin-top: 15px;
+      text-align: center;
+      color: #06b6d4;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Login LiftSenai</h1>
+    <form id="formLogin" autocomplete="off">
+      <input type="text" id="username" placeholder="Usuário" required />
+      <input type="password" id="password" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="msg" class="msg"></div>
+    <a href="cadastro.html">Não tem conta? Cadastre-se</a>
+  </div>
+
+  <script>
+    const form = document.getElementById('formLogin');
+    const msg = document.getElementById('msg');
+
+    function getUsers() {
+      const users = localStorage.getItem('users');
+      return users ? JSON.parse(users) : [];
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      msg.textContent = '';
+
+      const username = form.username.value.trim();
+      const password = form.password.value;
+
+      const users = getUsers();
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+
+      if (!user) {
+        msg.textContent = 'Usuário ou senha incorretos.';
+        return;
+      }
+
+      localStorage.setItem('loggedUser', JSON.stringify({ username: user.username }));
+      window.location.href = 'dashboard.html';
+    });
+
+    const logged = localStorage.getItem('loggedUser');
+    if (logged) {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+</body>
+</html>

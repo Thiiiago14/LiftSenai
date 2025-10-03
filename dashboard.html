@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - LiftSenai</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg,#071025 0%,#081426 60%);
+      color: #e6eef6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      padding: 30px;
+      border-radius: 12px;
+      width: 600px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      color: #e6eef6;
+    }
+    th, td {
+      border: 1px solid #06b6d4;
+      padding: 10px;
+    }
+    th {
+      background-color: #0b1220;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      background: #ef4444;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Bem-vindo(a), <span id="usernameDisplay"></span>!</h1>
+    <p>Você está logado no sistema LiftSenai.</p>
+
+    <h2>Alunos com carros e seus bairros</h2>
+    <table id="studentsTable" aria-label="Tabela de alunos com carros e bairros">
+      <thead>
+        <tr>
+          <th>Aluno</th>
+          <th>Carro</th>
+          <th>Bairro</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Conteúdo gerado por JS -->
+      </tbody>
+    </table>
+
+    <h2>Tarifas de Caronas</h2>
+    <table id="faresTable" aria-label="Tabela de tarifas de caronas">
+      <thead>
+        <tr>
+          <th>Bairro</th>
+          <th>Tarifa (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Conteúdo gerado por JS -->
+      </tbody>
+    </table>
+
+    <button id="logoutBtn">Sair</button>
+  </div>
+
+  <script>
+    const usernameDisplay = document.getElementById('usernameDisplay');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const studentsTableBody = document.querySelector('#studentsTable tbody');
+    const faresTableBody = document.querySelector('#faresTable tbody');
+
+    const loggedUser = localStorage.getItem('loggedUser');
+    if (!loggedUser) {
+      window.location.href = 'login.html';
+    } else {
+      const user = JSON.parse(loggedUser);
+      usernameDisplay.tex
+
+
+    }
