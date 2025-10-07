@@ -2,98 +2,198 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login - LiftSenai</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg,#071025 0%,#081426 60%);
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #081426;
       color: #e6eef6;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
     }
-    .card {
-      background: rgba(255,255,255,0.05);
+    .container {
+      background: #0b1220;
       padding: 30px;
       border-radius: 12px;
-      width: 360px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+      width: 350px;
     }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-    }
-    button {
-      background: #06b6d4;
-      color: #022;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .msg {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #fca5a5;
-      min-height: 18px;
-    }
-    a {
-      display: block;
-      margin-top: 15px;
+    h2 {
       text-align: center;
       color: #06b6d4;
-      text-decoration: none;
+      margin-bottom: 25px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    label {
+      font-weight: 600;
+    }
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #081426;
+      color: #e6eef6;
+      font-size: 1rem;
+    }
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #06b6d4;
+      color: #071025;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #0891b2;
+    }
+    .toggle-link {
+      margin-top: 10px;
+      text-align: center;
+      color: #06b6d4;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.9rem;
+    }
+    .error-message {
+      background: #ef4444;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .success-message {
+      background: #22c55e;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Login LiftSenai</h1>
-    <form id="formLogin" autocomplete="off">
-      <input type="text" id="username" placeholder="Usuário" required />
-      <input type="password" id="password" placeholder="Senha" required />
+  <div class="container">
+
+    
+    <form id="loginForm">
+      <h2>Login</h2>
+      <div id="loginError" class="error-message" style="display:none;"></div>
+      <label for="loginUsername">Usuário</label>
+      <input type="text" id="loginUsername" required />
+      <label for="loginPassword">Senha</label>
+      <input type="password" id="loginPassword" required />
       <button type="submit">Entrar</button>
+      <div class="toggle-link" id="showRegister">Não tem conta? Cadastre-se</div>
     </form>
-    <div id="msg" class="msg"></div>
-    <a href="cadastro.html">Não tem conta? Cadastre-se</a>
+
+    <!-- Registration Form -->
+    <form id="registerForm" style="display:none;">
+      <h2>Cadastro</h2>
+      <div id="registerError" class="error-message" style="display:none;"></div>
+      <div id="registerSuccess" class="success-message" style="display:none;"></div>
+      <label for="registerName">Nome Completo</label>
+      <input type="text" id="registerName" required />
+      <label for="registerUsername">Usuário</label>
+      <input type="text" id="registerUsername" required />
+      <label for="registerPassword">Senha</label>
+      <input type="password" id="registerPassword" required />
+      <button type="submit">Cadastrar</button>
+      <div class="toggle-link" id="showLogin">Já tem conta? Faça login</div>
+    </form>
+
   </div>
 
   <script>
-    const form = document.getElementById('formLogin');
-    const msg = document.getElementById('msg');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const showRegister = document.getElementById('showRegister');
+    const showLogin = document.getElementById('showLogin');
+    const loginError = document.getElementById('loginError');
+    const registerError = document.getElementById('registerError');
+    const registerSuccess = document.getElementById('registerSuccess');
 
-    function getUsers() {
-      const users = localStorage.getItem('users');
-      return users ? JSON.parse(users) : [];
+    
+    showRegister.addEventListener('click', () => {
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'flex';
+      clearMessages();
+    });
+
+    showLogin.addEventListener('click', () => {
+      registerForm.style.display = 'none';
+      loginForm.style.display = 'flex';
+      clearMessages();
+    });
+
+    function clearMessages() {
+      loginError.style.display = 'none';
+      registerError.style.display = 'none';
+      registerSuccess.style.display = 'none';
     }
 
-    form.addEventListener('submit', (e) => {
+    
+    registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      msg.textContent = '';
+      clearMessages();
 
-      const username = form.username.value.trim();
-      const password = form.password.value;
+      const name = document.getElementById('registerName').value.trim();
+      const username = document.getElementById('registerUsername').value.trim();
+      const password = document.getElementById('registerPassword').value;
 
-      const users = getUsers();
-      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+      
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userExists = users.some(u => u.username.toLowerCase() === username.toLowerCase());
 
-      if (!user) {
-        msg.textContent = 'Usuário ou senha incorretos.';
+      if (userExists) {
+        registerError.textContent = 'Usuário já existe. Escolha outro.';
+        registerError.style.display = 'block';
         return;
       }
 
-      localStorage.setItem('loggedUser', JSON.stringify({ username: user.username }));
-      window.location.href = 'dashboard.html';
+      
+      users.push({ username, password, name });
+      localStorage.setItem('users', JSON.stringify(users));
+
+      registerSuccess.textContent = 'Cadastro realizado com sucesso! Você pode fazer login agora.';
+      registerSuccess.style.display = 'block';
+
+      
+      registerForm.reset();
     });
 
-    const logged = localStorage.getItem('loggedUser');
-    if (logged) {
-      window.location.href = 'dashboard.html';
-    }
+    
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearMessages();
+
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+
+      if (!user) {
+        loginError.textContent = 'Usuário ou senha incorretos.';
+        loginError.style.display = 'block';
+        return;
+      }
+
+    
+      localStorage.setItem('loggedUser', JSON.stringify({ username: user.username, name: user.name }));
+      window.location.href = 'dashboard.html'; // Ajuste o nome se necessário
+    });
   </script>
 </body>
 </html>

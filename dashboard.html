@@ -2,102 +2,288 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard - LiftSenai</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Interativo - LiftSenai</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg,#071025 0%,#081426 60%);
+    /* seu CSS original */
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #081426;
       color: #e6eef6;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: #0b1220;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
+      gap: 15px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     }
-    .card {
-      background: rgba(255,255,255,0.05);
-      padding: 30px;
-      border-radius: 12px;
-      width: 600px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+
+    .sidebar h2 {
+      margin: 0 0 20px;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #06b6d4;
       text-align: center;
     }
+
+    .sidebar button {
+      background: none;
+      border: none;
+      color: #a0c4d7;
+      padding: 12px 15px;
+      text-align: left;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .sidebar button:hover,
+    .sidebar button.active {
+      background-color: #06b6d4;
+      color: #071025;
+    }
+
+    .sidebar button.logout {
+      margin-top: auto;
+      background-color: #ef4444;
+      color: white;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      padding: 25px;
+      overflow-y: auto;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    h1 {
+      color: #06b6d4;
+      margin-bottom: 15px;
+    }
+
+    /* Cards */
+    .cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .card {
+      flex: 1 1 220px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* Tabela */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(2, 6, 23, 0.6);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #06b6d4;
+      text-align: left;
+    }
+
+    th {
+      background: #06b6d4;
+      color: #071025;
+      font-weight: bold;
+    }
+
+    /* Formulário */
+    form {
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(2,6,23,0.6);
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    form input,
+    form select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #0b1220;
       color: #e6eef6;
     }
-    th, td {
-      border: 1px solid #06b6d4;
-      padding: 10px;
-    }
-    th {
-      background-color: #0b1220;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      border-radius: 8px;
+
+    form button {
+      background: #06b6d4;
       border: none;
-      background: #ef4444;
-      color: white;
-      font-weight: bold;
+      padding: 12px;
+      width: 100%;
+      border-radius: 8px;
+      font-weight: 700;
       cursor: pointer;
+      color: #071025;
+      transition: background 0.3s;
     }
-    h2 {
-      margin-top: 30px;
+
+    form button:hover {
+      background: #0891b2;
+    }
+
+    /* Nome usuário logado */
+    #userWelcome {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      color: #06b6d4;
+      font-weight: 600;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Bem-vindo(a), <span id="usernameDisplay"></span>!</h1>
-    <p>Você está logado no sistema LiftSenai.</p>
 
-    <h2>Alunos com carros e seus bairros</h2>
-    <table id="studentsTable" aria-label="Tabela de alunos com carros e bairros">
-      <thead>
-        <tr>
-          <th>Aluno</th>
-          <th>Carro</th>
-          <th>Bairro</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Conteúdo gerado por JS -->
-      </tbody>
-    </table>
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <h2>LiftSenai</h2>
+    <button class="tab-btn active" data-target="dashboard">Dashboard</button>
+    <button class="tab-btn" data-target="cadastro">Cadastro</button>
+    <button class="tab-btn" data-target="estatisticas">Estatísticas</button>
+    <button class="tab-btn" data-target="transito">Trânsito</button>
+    <button class="logout">Sair</button>
+  </nav>
 
-    <h2>Tarifas de Caronas</h2>
-    <table id="faresTable" aria-label="Tabela de tarifas de caronas">
-      <thead>
-        <tr>
-          <th>Bairro</th>
-          <th>Tarifa (R$)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Conteúdo gerado por JS -->
-      </tbody>
-    </table>
+  <!-- Main content -->
+  <main class="main-content">
+    <div id="userWelcome"></div>
 
-    <button id="logoutBtn">Sair</button>
-  </div>
+    <section id="dashboard" class="section active">
+      <h1>Bem-vindo(a) ao LiftSenai!</h1>
+      <p>Informações principais do sistema:</p>
+      <table>
+        <thead>
+          <tr><th>Aluno</th><th>Carro</th><th>Bairro</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>João Silva</td><td>Fiat Uno</td><td>Centro</td></tr>
+          <tr><td>Maria Souza</td><td>HB20</td><td>Trindade</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="cadastro" class="section">
+      <h1>Cadastrar novo aluno</h1>
+      <form id="formCadastro">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" placeholder="Nome completo" required>
+
+        <label for="carro">Modelo do carro:</label>
+        <input type="text" id="carro" placeholder="Ex: Gol, Uno" required>
+
+        <label for="bairro">Bairro:</label>
+        <select id="bairro" required>
+          <option value="">Selecione</option>
+          <option value="Centro">Centro</option>
+          <option value="Trindade">Trindade</option>
+          <option value="Ingleses">Ingleses</option>
+        </select>
+
+        <button type="submit">Cadastrar</button>
+      </form>
+    </section>
+
+    <section id="estatisticas" class="section">
+      <h1>Estatísticas</h1>
+      <p>Gráficos e métricas em breve...</p>
+    </section>
+
+    <section id="transito" class="section">
+      <h1>Informações sobre o trânsito</h1>
+      <div class="cards">
+        <div class="card">Rod. SC-401: Trânsito moderado</div>
+        <div class="card">Av. Beira Mar: Livre</div>
+        <div class="card">Rio Tavares: Congestionamento</div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    const usernameDisplay = document.getElementById('usernameDisplay');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const studentsTableBody = document.querySelector('#studentsTable tbody');
-    const faresTableBody = document.querySelector('#faresTable tbody');
+    // Controle das tabs
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const sections = document.querySelectorAll('.section');
+    const logoutBtn = document.querySelector('.logout');
+    const userWelcome = document.getElementById('userWelcome');
 
-    const loggedUser = localStorage.getItem('loggedUser');
-    if (!loggedUser) {
-      window.location.href = 'login.html';
-    } else {
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const target = btn.dataset.target;
+        sections.forEach(section => {
+          section.classList.toggle('active', section.id === target);
+        });
+      });
+    });
+
+    // Logout: limpar localStorage e voltar para login.html
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('loggedUser');
+      window.location.href = 'login.html'; // ajuste o nome da página de login se necessário
+    });
+
+    // Verifica login no carregamento da página
+    window.addEventListener('load', () => {
+      const loggedUser = localStorage.getItem('loggedUser');
+      if (!loggedUser) {
+        // Se não estiver logado, redireciona para login
+        window.location.href = 'login.html';
+        return;
+      }
       const user = JSON.parse(loggedUser);
-      usernameDisplay.tex
+      userWelcome.textContent = `Olá, ${user.name}!`;
+    });
 
-
-    }
+    // Exemplo simples de cadastro que só limpa o formulário (sem backend)
+    document.getElementById('formCadastro').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Cadastro realizado com sucesso (funcionalidade simulada).');
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

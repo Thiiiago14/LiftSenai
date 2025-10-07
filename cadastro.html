@@ -2,75 +2,162 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cadastro - LiftSenai</title>
   <style>
-    
+    /* Reset básico */
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg,#071025 0%,#081426 60%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, #071025 0%, #081426 60%);
       color: #e6eef6;
+      margin: 0;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      padding: 1rem;
     }
     .card {
-      background: rgba(255,255,255,0.05);
-      padding: 30px;
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2rem 2.5rem;
       border-radius: 12px;
-      width: 360px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
-    }
-    input, button {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
+      max-width: 400px;
+      box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+      transition: background 0.3s ease;
+    }
+    .card:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    h1 {
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-align: center;
+      color: #06b6d4;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input {
+      padding: 12px 14px;
+      margin-bottom: 1rem;
       border-radius: 8px;
       border: none;
-      font-size: 14px;
+      font-size: 1rem;
+      outline-offset: 2px;
+      transition: outline-color 0.3s ease;
+    }
+    input:focus {
+      outline: 2px solid #06b6d4;
+      background-color: #0e274f;
+      color: #e6eef6;
     }
     button {
-      background: #06b6d4;
+      padding: 12px 14px;
+      background-color: #06b6d4;
       color: #022;
-      font-weight: bold;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover,
+    button:focus {
+      background-color: #089abf;
+      outline: none;
     }
     .msg {
-      margin-top: 12px;
-      font-size: 13px;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      min-height: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .msg.error {
       color: #fca5a5;
-      min-height: 18px;
+    }
+    .msg.success {
+      color: #86efac;
     }
     a {
       display: block;
-      margin-top: 15px;
+      margin-top: 1.5rem;
       text-align: center;
       color: #06b6d4;
       text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+    a:hover,
+    a:focus {
+      color: #089abf;
+      text-decoration: underline;
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+      .card {
+        padding: 1.5rem 1.5rem;
+        width: 100%;
+        max-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
+  <main class="card" role="main" aria-label="Formulário de cadastro LiftSenai">
     <h1>Cadastro LiftSenai</h1>
-    <form id="formCadastro" autocomplete="off">
-      <input type="text" id="username" placeholder="Usuário" required />
-      <input type="password" id="password" placeholder="Senha" required />
-      <input type="password" id="passwordConfirm" placeholder="Confirme a senha" required />
+    <form id="formCadastro" autocomplete="off" novalidate>
+      <input 
+        type="text" 
+        id="username" 
+        name="username" 
+        placeholder="Usuário" 
+        minlength="3"
+        aria-describedby="usernameHelp"
+        required 
+      />
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        placeholder="Senha" 
+        minlength="4"
+        aria-describedby="passwordHelp"
+        required 
+      />
+      <input 
+        type="password" 
+        id="passwordConfirm" 
+        name="passwordConfirm" 
+        placeholder="Confirme a senha" 
+        minlength="4"
+        required 
+      />
       <button type="submit">Cadastrar</button>
     </form>
-    <div id="msg" class="msg"></div>
-    <a href="login.html">Já tem conta? Faça login</a>
-  </div>
+    <div id="msg" class="msg" role="alert" aria-live="polite"></div>
+    <a href="login.html" tabindex="0">Já tem conta? Faça login</a>
+  </main>
 
   <script>
     const form = document.getElementById('formCadastro');
     const msg = document.getElementById('msg');
 
     function getUsers() {
-      const users = localStorage.getItem('users');
-      return users ? JSON.parse(users) : [];
+      try {
+        const users = localStorage.getItem('users');
+        return users ? JSON.parse(users) : [];
+      } catch {
+        return [];
+      }
     }
 
     function saveUsers(users) {
@@ -80,18 +167,30 @@
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       msg.textContent = '';
+      msg.className = 'msg'; // reset classes
 
       const username = form.username.value.trim();
       const password = form.password.value;
       const passwordConfirm = form.passwordConfirm.value;
 
-      if (password !== passwordConfirm) {
-        msg.textContent = 'As senhas não conferem.';
+      if (username.length < 3) {
+        msg.textContent = 'Usuário precisa ter ao menos 3 caracteres.';
+        msg.classList.add('error');
+        form.username.focus();
         return;
       }
 
-      if (username.length < 3 || password.length < 4) {
-        msg.textContent = 'Usuário precisa ter ao menos 3 caracteres e senha ao menos 4.';
+      if (password.length < 4) {
+        msg.textContent = 'Senha precisa ter ao menos 4 caracteres.';
+        msg.classList.add('error');
+        form.password.focus();
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        msg.textContent = 'As senhas não conferem.';
+        msg.classList.add('error');
+        form.passwordConfirm.focus();
         return;
       }
 
@@ -99,14 +198,18 @@
       const userExists = users.some(u => u.username.toLowerCase() === username.toLowerCase());
       if (userExists) {
         msg.textContent = 'Usuário já existe.';
+        msg.classList.add('error');
+        form.username.focus();
         return;
       }
 
       users.push({ username, password });
       saveUsers(users);
 
-      msg.style.color = '#86efac'; 
       msg.textContent = 'Cadastro realizado com sucesso! Você será redirecionado para login...';
+      msg.classList.add('success');
+
+      form.reset();
 
       setTimeout(() => {
         window.location.href = 'login.html';
